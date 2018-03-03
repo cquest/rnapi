@@ -44,3 +44,5 @@ Par code INSEE de commune:
 
 Par code SIRET:
 - http://stmaur.cquest.org:1901/rna?siret=41473595100017
+
+Version swagger dispo sur: https://app.swaggerhub.com/apis/cquest/rnapi/0.0.1

@@ -1,0 +1,101 @@
+swagger: '2.0'
+info:
+  description: API "quick and dirty" d'interrogation du RNA
+  version: 0.0.1
+  title: RNApi
+  # put the contact info for your development or API team
+  contact:
+    email: christian.quest@data.gouv.fr
+
+  license:
+    name: Licence Ouverte 2.0
+
+paths:
+  /rna:
+    get:
+      summary: cherche une ou plusieurs associations
+      operationId: searchRNA
+      description: |
+        Vous pouvez chercher une association en utilisant différents critères
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: nom
+        description: nom ou portion de nom de l'association
+        required: false
+        type: string
+      - in: query
+        name: insee
+        description: code INSEE de la commune du siège de l'association
+        type: string
+      - in: query
+        name: rna
+        description: N° RNA ou d'enregistrement de l'association
+        type: string
+      - in: query
+        name: rnreta
+        description: N° SIRET de l'association
+        type: string
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RNA'
+        400:
+          description: bad input parameter
+definitions:
+  RNA:
+    type: object
+    required:
+    - id
+    - id_ex
+    - siret
+    - rup_mi
+    - gestion
+    - date_creat
+    - date_decla
+    - date_publi
+    - date_disso
+    - nature
+    - groupement
+    - titre
+    - titre_court
+    - objet
+    - objet_social1
+    - objet_social2
+    - adrs_complement
+    - adrs_numvoie
+    - adrs_typevoie
+    - adrs_libvoie
+    - adrs_distrib
+    - adrs_odeinsee
+    - adrs_codepostal
+    - adrs_libcommune
+    - ardg_declarant
+    - adrg_compleid
+    - adrg_complemgeo
+    - adrg_libvoie
+    - adrg_distrib
+    - adrg_codepostal
+    - adrg_achemine
+    - adrg_pays
+    - dir_civilite
+    - telephone
+    - siteweb
+    - email
+    - publiweb
+    - observation
+    - position
+    - majk_time
+    properties:
+      id:
+        type: string
+        example: W751212517
+# Added by API Auto Mocking Plugin
+host: stmaur.cquest.org:1901
+basePath: /
+schemes:
+ - http
