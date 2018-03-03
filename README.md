@@ -20,4 +20,22 @@ pip install -r requirements.txt
 gunicorn rnapi:app -b 0.0.0.0:1901
 ```
 
-http://localhost:1901/rna?nom=FNACA
+## Exemples de recherches
+
+Par nom: http://stmaur.cquest.org:1901/rna?nom=OpenStreetMap
+
+Par nom + code INSEE de commune:
+
+http://stmaur.cquest.org:1901/rna?nom=OpenStreetMap&insee=75102
+
+Par code RNA ou de déclaration:
+
+http://stmaur.cquest.org:1901/rna?rna=W751212517
+
+Par code INSEE de commune:
+
+http://stmaur.cquest.org:1901/rna?insee=89004
+
+Par code SIRET:
+
+http://stmaur.cquest.org:1901/rna?siret=41473595100017
