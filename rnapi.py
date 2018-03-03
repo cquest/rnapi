@@ -40,7 +40,7 @@ class RnaResource(object):
 
         query = """SELECT row_to_json(row) FROM (
             SELECT * FROM rna WHERE %s %s LIMIT %s
-            ) as row;""" % (where, order, 100)
+            ) as row;""" % (where, order, 1000)
         cur.execute(query)
 
         rna = cur.fetchall()
