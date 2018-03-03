@@ -1,0 +1,3 @@
+falcon
+gunicorn
+psycopg2-binary
