@@ -45,12 +45,13 @@ class RnaResource(object):
         else:
             where = cur.mogrify("(id=%s)", (id,)).decode("utf-8")
 
-        query = """SELECT row_to_json(row) FROM (
+        query = """SELECT row_to_json(row)::text FROM (
             SELECT * FROM rna WHERE %s %s LIMIT %s OFFSET %s
             ) as row;""" % (where, order, limit+1, (page-1)*limit)
         cur.execute(query)
 
         rna = cur.fetchall()
+        print(rna)
 
         resp.status = falcon.HTTP_200
         resp.set_header('X-Powered-By', 'RNApi')
@@ -60,9 +61,13 @@ class RnaResource(object):
         resp.set_header('Access-Control-Allow-Headers',
                         'Origin, X-Requested-With, Content-Type, Accept')
         if len(rna) > limit:
-            resp.set_header('X-Next-Page', '*')
+            resp.set_header('X-More-Page', 'True')
             del rna[limit]
-        resp.body = json.dumps(rna, sort_keys=True)
+        resp.body = '['
+        for r in rna[:-1]:
+            resp.body = resp.body + r[0] + ','
+        resp.body = resp.body + r[0]
+        resp.body = resp.body + ']'
         db.close()
 
     def on_get(self, req, resp, id=None):
