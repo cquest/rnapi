@@ -52,7 +52,7 @@ class RnaResource(object):
                         "Access-Control-Allow-Origin")
         resp.set_header('Access-Control-Allow-Headers',
                         'Origin, X-Requested-With, Content-Type, Accept')
-        resp.body = json.dumps(rna)
+        resp.body = json.dumps(rna, sort_keys=True)
         db.close()
 
     def on_get(self, req, resp):
