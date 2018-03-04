@@ -20,7 +20,7 @@ class RnaResource(object):
             where = cur.mogrify("(id=%s OR id_ex=%s)",
                                 (rna, rna)).decode("utf-8")
         elif siret:
-            where = cur.mogrify("(siret=%s)", siret).decode("utf-8")
+            where = cur.mogrify("(siret=%s)", (siret,)).decode("utf-8")
         else:
             # recherche par nom
             nom = req.params.get('nom', None)
