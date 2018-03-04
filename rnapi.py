@@ -11,7 +11,7 @@ class RnaResource(object):
         cur = db.cursor()
 
         where = '(TRUE)'
-        order = ''
+        order = ' ORDER BY id '  # tri par défaut
 
         # pagination
         limit = 100
@@ -46,8 +46,8 @@ class RnaResource(object):
             where = cur.mogrify("(id=%s)", (id,)).decode("utf-8")
 
         query = """SELECT row_to_json(row) FROM (
-            SELECT * FROM rna WHERE %s %s LIMIT %s
-            ) as row;""" % (where, order, 1000)
+            SELECT * FROM rna WHERE %s %s LIMIT %s OFFSET %s
+            ) as row;""" % (where, order, limit+1, (page-1)*limit)
         cur.execute(query)
 
         rna = cur.fetchall()
@@ -59,6 +59,9 @@ class RnaResource(object):
                         "Access-Control-Allow-Origin")
         resp.set_header('Access-Control-Allow-Headers',
                         'Origin, X-Requested-With, Content-Type, Accept')
+        if len(rna) > limit:
+            resp.set_header('X-Next-Page', '*')
+            del rna[limit]
         resp.body = json.dumps(rna, sort_keys=True)
         db.close()
 
