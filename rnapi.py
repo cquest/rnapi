@@ -6,37 +6,44 @@ import re
 
 
 class RnaResource(object):
-    def getRna(self, req, resp):
+    def getRna(self, req, resp, id=None):
         db = psycopg2.connect("dbname=cquest")
         cur = db.cursor()
 
         where = '(TRUE)'
         order = ''
 
-        # recherche sur le numéro d'association
-        rna = req.params.get('rna', None)
-        siret = req.params.get('siret', None)
-        if rna:
-            where = cur.mogrify("(id=%s OR id_ex=%s)",
-                                (rna, rna)).decode("utf-8")
-        elif siret:
-            where = cur.mogrify("(siret=%s)", (siret,)).decode("utf-8")
+        # pagination
+        limit = 100
+        page = int(req.params.get('page', 1))
+
+        if not id:
+            # recherche sur le numéro d'association
+            rna = req.params.get('rna', None)
+            siret = req.params.get('siret', None)
+            if rna:
+                where = cur.mogrify("(id=%s OR id_ex=%s)",
+                                    (rna, rna)).decode("utf-8")
+            elif siret:
+                where = cur.mogrify("(siret=%s)", (siret,)).decode("utf-8")
+            else:
+                # recherche par nom
+                nom = req.params.get('nom', None)
+                if nom:
+                    # on supprime les mots trop courants
+                    nom_clean = re.sub('(ASSO[CIATION]*)', '', nom.upper())
+                    where = where + cur.mogrify(" AND titre ~ %s",
+                                                (nom_clean,)).decode("utf-8")
+                    where = where.replace('~', '%')
+                    order = cur.mogrify(" ORDER BY titre <-> %s",
+                                        (nom,)).decode("utf-8")
+                # recherche par code INSEE de commune
+                insee = req.params.get('insee', None)
+                if insee:
+                    where = where + cur.mogrify(" AND adrs_codeinsee=%s",
+                                                (insee,)).decode('utf-8')
         else:
-            # recherche par nom
-            nom = req.params.get('nom', None)
-            if nom:
-                # on supprime les mots trop courants
-                nom_clean = re.sub('(ASSO[CIATION]*)', '', nom.upper())
-                where = where + cur.mogrify(" AND titre ~ %s",
-                                            (nom_clean,)).decode("utf-8")
-                where = where.replace('~', '%')
-                order = cur.mogrify(" ORDER BY titre <-> %s",
-                                    (nom,)).decode("utf-8")
-            # recherche par code INSEE de commune
-            insee = req.params.get('insee', None)
-            if insee:
-                where = where + cur.mogrify(" AND adrs_codeinsee=%s",
-                                            (insee,)).decode('utf-8')
+            where = cur.mogrify("(id=%s)", (id,)).decode("utf-8")
 
         query = """SELECT row_to_json(row) FROM (
             SELECT * FROM rna WHERE %s %s LIMIT %s
@@ -55,8 +62,8 @@ class RnaResource(object):
         resp.body = json.dumps(rna, sort_keys=True)
         db.close()
 
-    def on_get(self, req, resp):
-        self.getRna(req, resp)
+    def on_get(self, req, resp, id=None):
+        self.getRna(req, resp, id)
 
 # falcon.API instances are callable WSGI apps
 app = falcon.API()
@@ -65,3 +72,4 @@ app = falcon.API()
 rna = RnaResource()
 # things will handle all requests to the matching URL path
 app.add_route('/rna', rna)
+app.add_route('/rna/{id}', rna)  # handle single event requests
