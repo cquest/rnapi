@@ -50,7 +50,6 @@ class RnaResource(object):
         cur.execute(query)
 
         rna = cur.fetchall()
-        print(rna)
 
         resp.status = falcon.HTTP_200
         resp.set_header('X-Powered-By', 'RNApi')
