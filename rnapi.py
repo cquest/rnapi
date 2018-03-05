@@ -32,9 +32,8 @@ class RnaResource(object):
                 if nom:
                     # on supprime les mots trop courants
                     nom_clean = re.sub('(ASSO[CIATION]*)', '', nom.upper())
-                    where = where + cur.mogrify(" AND titre ~ %s",
-                                                (nom_clean,)).decode("utf-8")
-                    where = where.replace('~', '%')
+                    where = where + cur.mogrify(" AND (titre %% %s OR titre ~ %s)",
+                                                (nom_clean,nom_clean)).decode("utf-8")
                     order = cur.mogrify(" ORDER BY titre <-> %s",
                                         (nom,)).decode("utf-8")
                 # recherche par code INSEE de commune
