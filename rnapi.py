@@ -58,14 +58,17 @@ class RnaResource(object):
                         "Access-Control-Allow-Origin")
         resp.set_header('Access-Control-Allow-Headers',
                         'Origin, X-Requested-With, Content-Type, Accept')
-        if len(rna) > limit:
-            resp.set_header('X-More-Page', 'True')
-            del rna[limit]
-        resp.body = '['
-        for r in rna[:-1]:
-            resp.body = resp.body + r[0] + ','
-        resp.body = resp.body + r[0]
-        resp.body = resp.body + ']'
+        if len(rna) > 0:
+            if len(rna) > limit:
+                resp.set_header('X-More-Page', 'True')
+                del rna[limit]
+            resp.body = '['
+            for r in rna[:-1]:
+                resp.body = resp.body + r[0] + ','
+            resp.body = resp.body + rna[len(rna)-1][0]
+            resp.body = resp.body + ']'
+        else:
+            resp.body = ''
         db.close()
 
     def on_get(self, req, resp, id=None):
